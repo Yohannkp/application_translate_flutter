@@ -49,6 +49,4 @@ Cette application utilise Flutter pour fournir une interface permettant à l'uti
 
 Les contributions sont les bienvenues ! Si vous souhaitez proposer des modifications ou des améliorations, n'hésitez pas à ouvrir une issue ou une pull request.
 
-## Licence
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
