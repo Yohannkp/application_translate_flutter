@@ -1,8 +1,12 @@
+
+import 'package:TRANSCORRE/traductionScreen.dart';
+import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:tpgoupeflutter2/correctionorthographe.dart';
-import 'package:tpgoupeflutter2/hiddenDrawer.dart';
-import 'package:tpgoupeflutter2/traductionScreen.dart';
+
+
+import 'correctionorthographe.dart';
+import 'hiddenDrawer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +20,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CORRECTEUR & TRADUCTION',
 
-      home: HiddenDrawer(),
+      home: FlutterSplashScreen.fadeIn(
+        backgroundColor: Colors.white,
+        onInit: () {
+          debugPrint("On Init");
+        },
+        onEnd: () {
+          debugPrint("On End");
+        },
+        childWidget: SizedBox(
+          height: 200,
+          width: 200,
+          child: Image.asset("lib/assets/ic_launcher.png"),
+        ),
+        onAnimationEnd: () => debugPrint("On Fade In End"),
+        nextScreen: HiddenDrawer(),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,8 +1,12 @@
+
+import 'package:TRANSCORRE/traductionScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
-import 'package:tpgoupeflutter2/correctionorthographe.dart';
-import 'package:tpgoupeflutter2/main.dart';
-import 'package:tpgoupeflutter2/traductionScreen.dart';
+
+import 'correctionorthographe.dart';
+import 'main.dart';
+import 'IA.dart';
+
 class HiddenDrawer extends StatefulWidget {
   const HiddenDrawer({super.key});
 
@@ -21,7 +25,9 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
       ScreenHiddenDrawer(ItemHiddenMenu(name: "T R A D U C T I O N", baseStyle: TextStyle(),colorLineSelected: Colors.orange, selectedStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)), TranslationScreen()),
       ScreenHiddenDrawer(ItemHiddenMenu(name: "O R T H O G R A P H E", baseStyle: TextStyle(),colorLineSelected: Colors.orange, selectedStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)), SpellCheckerScreen()),
       ScreenHiddenDrawer(ItemHiddenMenu(name: "A C C E U I L", baseStyle: TextStyle(),colorLineSelected: Colors.orange, selectedStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)), MainMenuScreen()),
-          ];
+      ScreenHiddenDrawer(ItemHiddenMenu(name: "I A", baseStyle: TextStyle(),colorLineSelected: Colors.orange, selectedStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),IA() ),
+
+    ];
   }
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -58,7 +59,8 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
         {
           'role': 'user',
           'content':
-          "Corrige les fautes d'orthographe et de grammaire dans le texte suivant et renvoie uniquement le texte corrigé, sans aucune explication, commentaire ou autre information. Voici le texte à corriger : '$text')"
+
+          "Corrige uniquement les fautes d'orthographe dans ce texte. Ne fais aucun autre changement, ne retourne aucun commentaire, garde le texte exactement tel qu'il est sauf pour corriger les erreurs d'orthographe : $text"
         }
       ],
       'model': 'llama3-8b-8192'
@@ -71,7 +73,7 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));  // Décodage UTF-8 ici
       setState(() {
         _messages.add({
           'role': 'bot',
@@ -79,7 +81,7 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
         });
         _isLoading = false; // Fin du chargement
         _scrollToBottom();
-        addSuccess();// Scroll automatiquement vers le bas
+        addSuccess();
       });
     } else {
       print('Erreur : ${response.statusCode}');
@@ -88,8 +90,13 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
         _scrollToBottom(); // Scroll to bottom even if there's an error
       });
     }
+    await Future.delayed(Duration(seconds: 2));
+    addIdle();
     _textController.clear(); // Vider le champ de texte après soumission
   }
+
+
+
 
   // Scroll vers le bas de la ListView
   void _scrollToBottom() {
@@ -103,10 +110,19 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
       }
     });
   }
+  /*
+  FlutterTts flutterTts = FlutterTts();
+
+  Future<void> _speak(String text) async {
+    await flutterTts.setLanguage("fr-FR");  // Définit la langue en français
+    await flutterTts.setPitch(1.0);         // Définit le ton
+    await flutterTts.speak(text);           // Parle le texte
+  }*/
   @override
   void initState() {
     // TODO: implement initState
     print("Fonction de dépard");
+
     idle = SimpleAnimation(Animated.idle.name);
     handsDown = SimpleAnimation(Animated.hands_down.name);
     handsUp = SimpleAnimation(Animated.Hands_up.name);
@@ -129,9 +145,13 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
 
     );
 
+    bool listening = false;
+
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
-        addHandsUp();
+        setState(() {
+          listening = true;
+        });
       } else {
         addHandsDown();
       }
@@ -281,6 +301,7 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
                     FloatingActionButton(
                       onPressed: () {
                         if (!_isLoading) {
+                          addIdle();
                           if(_textController.text ==""){
                             addfail();
 
@@ -301,6 +322,7 @@ class _SpellCheckerScreenState extends State<SpellCheckerScreen> {
                               ),
                             );
                           }else{
+                            addIdle();
                             correctionOrthographe(_textController.text);
                           }
 

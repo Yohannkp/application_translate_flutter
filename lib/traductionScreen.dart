@@ -1,19 +1,31 @@
+// On importe les outils qu'on va utiliser pour bosser :
+// Convertir du JSON, envoyer des messages à une API, et faire de jolies interfaces avec Flutter.
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+// Classe principale pour notre écran de traduction
 class TranslationScreen extends StatefulWidget {
   @override
   _TranslationScreenState createState() => _TranslationScreenState();
 }
 
+// Ici c’est là où la magie opère : on gère l’état de l’appli avec des animations cool
 class _TranslationScreenState extends State<TranslationScreen>
     with SingleTickerProviderStateMixin {
+
+  // Contrôle le texte que l’utilisateur tape dans le champ
   final TextEditingController _textController = TextEditingController();
+
+  // On garde ici le texte traduit, prêt à être affiché
   String _translatedText = "";
-  String _selectedLanguage = 'en'; // Langue par défaut : Anglais
+
+  // Langue par défaut (Anglais), mais ça peut changer avec le menu déroulant
+  String _selectedLanguage = 'en';
+
+  // Voici toutes les langues qu'on peut choisir (code langue : nom complet)
   Map<String, String> _languages = {
     'en': 'Anglais',
     'fr': 'Français',
@@ -41,31 +53,38 @@ class _TranslationScreenState extends State<TranslationScreen>
     'id': 'Indonésien',
   };
 
+  // AnimationController pour faire un joli effet quand le texte traduit apparaît
   late AnimationController _controller;
   late Animation<double> _fadeInAnimation;
 
+  // Initialisation de l’animation (on va faire un fade-in trop stylé)
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500), // L'animation va durer 500ms
       vsync: this,
     );
     _fadeInAnimation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeIn,
+      curve: Curves.easeIn, // On fait en sorte que l'apparition soit smooth
     );
   }
 
+  // Fonction qui envoie une requête à l'API pour traduire le texte
   Future<void> traduireTexte(String text, String langue) async {
+
+    // URL de l'API et clé d'authentification (comme un sésame magique)
     const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
     const apiKey = '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';
 
+    // En-têtes pour dire à l'API qu’on parle en JSON et qu’on est autorisés à lui causer
     final headers = {
       'Authorization': 'Bearer $apiKey',
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json ',
     };
 
+    // On envoie le texte avec la langue choisie à l'API en format JSON
     final body = jsonEncode({
       'messages': [
         {
@@ -76,33 +95,38 @@ class _TranslationScreenState extends State<TranslationScreen>
       'model': 'llama3-8b-8192'
     });
 
+    // On envoie la requête POST et on attend la réponse de l'API
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: headers,
       body: body,
     );
 
+    // Si ça fonctionne (status 200), on récupère le texte traduit
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       setState(() {
-        _translatedText = data['choices'][0]['message']['content'];
-        _controller.forward(); // Démarrer l'animation de transition
+        _translatedText = data['choices'][0]['message']['content']; // On affiche le texte traduit
+        _controller.forward(); // Démarre l'animation pour faire apparaître le texte
       });
     } else {
+      // Si ça plante, on affiche une erreur
       print('Erreur : ${response.statusCode}');
     }
   }
 
+  // On clean le contrôleur d’animation quand l’écran est fermé
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  // Voilà la partie où on construit toute l’interface visuelle
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1F1B24),
+      backgroundColor: Color(0xFF1F1B24), // Couleur de fond trop stylée
 
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -110,36 +134,41 @@ class _TranslationScreenState extends State<TranslationScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+
+              // Champ de texte où l'utilisateur entre ce qu'il veut traduire
               TextField(
-                controller: _textController,
-                maxLines: 5,
-                style: TextStyle(color: Colors.white, fontFamily: 'Roboto'),
+                controller: _textController, // Relie le champ au TextEditingController
+                maxLines: 5, // Nombre de lignes de texte (ici 5)
+                style: TextStyle(color: Colors.white, fontFamily: 'Roboto'), // Style du texte
                 decoration: InputDecoration(
-                  hintText: 'Entrez le texte à traduire...',
-                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  hintText: 'Entrez le texte à traduire...', // Texte indicatif
+                  hintStyle: TextStyle(color: Colors.grey[500]), // Couleur du hint
                   filled: true,
-                  fillColor: Color(0xFF2E2A35),
+                  fillColor: Color(0xFF2E2A35), // Couleur de fond du champ
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(12), // Bord arrondi du champ
+                    borderSide: BorderSide.none, // Pas de bordure visible
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+
+              SizedBox(height: 20), // Petit espace entre les éléments
+
+              // Menu déroulant pour choisir la langue de traduction
               DropdownButton<String>(
-                dropdownColor: Color(0xFF2E2A35),
-                value: _selectedLanguage,
+                dropdownColor: Color(0xFF2E2A35), // Couleur de fond du menu
+                value: _selectedLanguage, // La langue sélectionnée actuellement
                 onChanged: (String? newValue) {
                   setState(() {
-                    _selectedLanguage = newValue!;
+                    _selectedLanguage = newValue!; // On met à jour la langue sélectionnée
                   });
                 },
                 items: _languages.keys.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
-                    value: value,
+                    value: value, // Le code de la langue
                     child: Text(
-                      _languages[value] ?? value,
-                      style: TextStyle(color: Colors.white),
+                      _languages[value] ?? value, // Le nom de la langue
+                      style: TextStyle(color: Colors.white), // Couleur du texte
                     ),
                   );
                 }).toList(),
@@ -147,34 +176,37 @@ class _TranslationScreenState extends State<TranslationScreen>
                   color: Colors.white,
                   fontFamily: 'Roboto',
                 ),
-                iconEnabledColor: Colors.white,
+                iconEnabledColor: Colors.white, // Couleur de l'icône du menu déroulant
               ),
-              SizedBox(height: 20),
+
+              SizedBox(height: 20), // Encore un petit espace
+
+              // Bouton pour lancer la traduction
               ElevatedButton(
                 onPressed: () {
-
-                  if(_textController.text ==""){
+                  // Si le champ de texte est vide, on affiche une alerte
+                  if(_textController.text == ""){
                     showTopSnackBar(
                       Overlay.of(context),
                       CustomSnackBar.error(
                         message:
-                        "Ce champ ne peut pas être vide, entrez du texte s'il vous plait!",
+                        "Ce champ ne peut pas être vide, entrez du texte s'il vous plaît!",
                       ),
                     );
-                  }else{
+                  } else {
+                    // Sinon, on appelle la fonction pour traduire le texte
                     traduireTexte(_textController.text, _selectedLanguage);
                   }
-
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.orange, // Couleur du bouton
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12), // Bord arrondi
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 15),
+                  padding: EdgeInsets.symmetric(vertical: 15), // Taille du bouton
                 ),
                 child: Text(
-                  'Traduire',
+                  'Traduire', // Texte sur le bouton
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -183,9 +215,12 @@ class _TranslationScreenState extends State<TranslationScreen>
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+
+              SizedBox(height: 20), // Encore un espace
+
+              // Transition pour faire apparaître le texte traduit en mode smooth
               FadeTransition(
-                opacity: _fadeInAnimation,
+                opacity: _fadeInAnimation, // Utilise l’animation définie plus haut
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -199,14 +234,16 @@ class _TranslationScreenState extends State<TranslationScreen>
                       ),
                     ),
                     SizedBox(height: 10),
+
+                    // Conteneur pour afficher le texte traduit
                     Container(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12), // Espace interne au conteneur
                       decoration: BoxDecoration(
-                        color: Color(0xFF2E2A35),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Color(0xFF2E2A35), // Couleur de fond du conteneur
+                        borderRadius: BorderRadius.circular(12), // Bord arrondi
                       ),
                       child: Text(
-                        _translatedText,
+                        _translatedText, // Le texte traduit s’affiche ici
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'Roboto',
