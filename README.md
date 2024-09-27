@@ -9,6 +9,8 @@ Cette application utilise Flutter pour fournir une interface permettant à l'uti
 - Conversion du texte en parole à l'aide du Text-to-Speech (TTS).
 - Possibilité d'arrêter la lecture vocale à tout moment.
 - Interface animée et réactive.
+- Correction des fautes d'orthographe
+- Traduction de texte en plusieurs langue
 
 ## Liens
 
