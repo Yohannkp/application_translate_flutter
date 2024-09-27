@@ -16,10 +16,6 @@ Cette application utilise Flutter pour fournir une interface permettant à l'uti
 
 - [Télécharger l'application](https://drive.google.com/file/d/1a76glMwJPePfoZuSV2Zj6k68_7VsRG-P/view?usp=drive_link)
 
-## Captures d'écran
-
-_(Ajoutez ici des captures d'écran de l'application pour montrer l'interface à vos utilisateurs.)_
-
 ## Installation
 
 1. Clonez ce repository :
