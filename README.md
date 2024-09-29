@@ -14,7 +14,7 @@ Cette application utilise Flutter pour fournir une interface permettant à l'uti
 
 ## Liens
 
-- [Télécharger l'application](https://drive.google.com/file/d/1a76glMwJPePfoZuSV2Zj6k68_7VsRG-P/view?usp=drive_link)
+- [Télécharger l'application](https://drive.google.com/file/d/1a76glMwJPePfoZuSV2Zj6k68_7VsRG-P/view?usp=sharing)
 
 ## Installation
 
